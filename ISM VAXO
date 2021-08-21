@@ -1,0 +1,88 @@
+#Load libraries
+import os
+import pandas as pd 
+import numpy as np
+
+#Set Wd 
+os.chdir("C:\\Users\\gabri\\Desktop\\Data collection and analysis\\PhD Chapters\\Drivers of SBMI\\ISM Python")
+
+#Load matrix then assigning index and column names
+ssim = pd.read_csv("VAXO matrix.csv", header=None)
+ssim.columns = [12,11,10,9,8,7,6,5,4,3,2,1]
+ssim.index = [1,2,3,4,5,6,7,8,9,10,11,12]
+ssim
+
+#Application of the VAXO rule to develop initial reachability matrix 
+(a) 						If the (i, j) entry in the SSIM is V, then the (i, j) entry in the reachability matrix becomes 1 and the (j, i) entry becomes 0.
+(b) 						If the (i, j) entry in the SSIM is A, then the (i, j) entry in the matrix becomes 0 and the (j, i) entry becomes 1.
+(c) 						If the (i, j) entry in the SSIM is X, then the (i, j) entry in the matrix becomes 1 and the (j, i) entry also becomes 1.
+(d) 						If the (i, j) entry in the SSIM is O, then the (i, j) entry in the matrix becomes 0 and the (j, i) entry also becomes 0.
+
+def reachmatrix(M):
+    n = len(M)
+    rm = pd.DataFrame(index=range(n),columns=range(n))
+    rm.index = [1,2,3,4,5,6,7,8,9,10,11,12]
+    rm.columns = [1,2,3,4,5,6,7,8,9,10,11,12]
+    
+    for i in range(1,n+1):
+        for j in range(1,n+1):
+            if M.loc[i,j] == 'V': 
+                rm.loc[i,j] = 1
+                rm.loc[j,i] = 0
+            if M.loc[i,j] == 'A': 
+                rm.loc[i,j] = 0
+                rm.loc[j,i] = 1
+            if M.loc[i,j] == 'X': 
+                rm.loc[i,j] = 1
+                rm.loc[j,i] = 1
+            if M.loc[i,j] == 'O': 
+                rm.loc[i,j] = 0
+                rm.loc[j,i] = 0
+            if i == j: 
+                rm.loc[i,j] = 1
+    return rm
+    
+    #The Warshal algorithm helps check IRM agaisnt the transitivity rule: if A-B and B-C, then A-C. 
+    
+    def warshall(M): 
+      n = len(M)
+      W = M 
+      for k in range(1,n+1):
+          for i in range(1,n+1): 
+              for j in range(1,n+1): 
+                  W.loc[i,j] = W.loc[i,j] or (W.loc[i,k] and W.loc[k,j])
+    return W
+    
+    #Conical form of final rachability matrix
+    
+    indx = [5,12,3,11,8,1,2,4,7,10,6,9]
+    cols = indx
+    
+    def conical(M, indx, cols): 
+      n = len(M)
+      con = pd.DataFrame(index=indx,columns=cols)
+      for i in range(1,n+1): 
+          for j in range(1,n+1):
+              con.loc[i,j] = M.loc[i,j]
+    return con 
+    
+    #Simple diagraph for python
+    
+       # Libraries needed to create the diagraph
+      import matplotlib.pyplot as plt
+      import networkx as nx
+      import numpy as np
+
+      # Go through the conical matrix adding edges to the diagraph
+      n = len(irm)
+      G = nx.DiGraph()
+
+      for i in range(1,n+1):
+          for j in range(1,n+1):
+              if irm.loc[i][j] == 1:
+                  G.add_edge(i,j) 
+
+      # Draw the diagraph
+      nx.draw(G, with_labels=True, font_weight='bold') 
+      plt.show() 
+      #plt.savefig('diagraph.pdf')

@@ -1,0 +1,42 @@
+# In order to find the strength of indirect relations between the driving factors the FDRM needs go through the stabilisation process. It 
+consists in a matrix multiplication process using max-min fuzzy composition. The process is guided by the following rule: 
+  T=μ_RoS=maxn⁡[min⁡(μ_R (x,n),μ_S (n,y)]
+  Where, R = Xin and S = Ynj. 
+
+# Load libraries 
+  import numpy as np
+  import pandas as pd 
+  import os
+
+#Import and read file 
+  os.chdir("C:\\Users\\...")
+  df = pd.read_csv("Fuzzy Direct Reachability Matrix.csv", header=None)
+  df
+  
+#Transform dataframe into array before procceding with matrix multiplications. Create two arrways for self-multiplications. 
+  x = df.to_numpy()
+  y = df.to_numpy()
+  x
+  
+# Max-Min Composition given by Zadeh
+  def maxMin(x, y):
+      z = []
+      for x1 in x:
+          for y1 in y.T:
+              z.append(max(np.minimum(x1, y1)))
+      return np.array(z).reshape((x.shape[0], y.shape[1]))
+
+# Max-product Composition 
+  def maxProduct(x, y):
+      z = []
+      for x1 in x:
+          for y1 in y.T:
+              z.append(max(np.multiply(x1, y1)))
+      return np.array(z).reshape((x.shape[0], y.shape[1]))
+      
+# Present multiplication result as dataframe with driving power and dependence power 
+A = maxMin(x,y)
+Ad1 = pd.DataFrame(A) 
+Ad1.loc['Dp. P']= Ad1.sum(numeric_only=True, axis=0)
+Ad1.loc[:,'Dr. P'] = Ad1.sum(numeric_only=True, axis=1)
+Ad1

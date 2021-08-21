@@ -45,13 +45,18 @@ def reachmatrix(M):
     #The Warshal algorithm helps check IRM agaisnt the transitivity rule: if A-B and B-C, then A-C. 
     
     def warshall(M): 
-      n = len(M)
-      W = M 
-      for k in range(1,n+1):
-          for i in range(1,n+1): 
-              for j in range(1,n+1): 
-                  W.loc[i,j] = W.loc[i,j] or (W.loc[i,k] and W.loc[k,j])
-    return W
+        W = M 
+        s =(len(M),len(M))
+        frm = pd.DataFrame(np.zeros(s, dtype=int))
+        labels = list(range(1,len(M)+1)) 
+        frm.index = labels
+        frm.columns = labels
+        for k in range(1,len(M)+1):
+            for i in range(1,len(M)+1): 
+                for j in range(1,len(M)+1): 
+                    if frm.loc[i,j] == 0:
+                        frm.loc[i,j] = W.loc[i,j] or (W.loc[i,k] and W.loc[k,j])
+        return frm
     
     #Conical form of final rachability matrix
     
